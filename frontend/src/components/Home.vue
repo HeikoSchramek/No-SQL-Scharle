@@ -1,4 +1,6 @@
 <script setup>
+import ShowBlogCard from './showBlogCard.vue';
+
 
 
 
@@ -12,7 +14,7 @@
    
    
    
-   
+   <ShowBlogCard></ShowBlogCard>
    
 </template>
 
