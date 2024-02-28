@@ -17,14 +17,26 @@ mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('MongoDB verbunden'))
   .catch(err => console.error('MongoDB Verbindungsfehler:', err));
 
-const blogpostSchema = new mongoose.Schema({
-  title: String,
-  content: String,
-  autor: String,
-  date: { type: Date, default: Date.now }
-});
-
-const Blogpost = mongoose.model('Blogpost', blogpostSchema);
+  const sectionSchema = new mongoose.Schema({
+    type: {
+      type: String,
+      required: true,
+      enum: ['subheading', 'text']
+    },
+    text: {
+      type: String,
+      required: true
+    }
+  });
+  
+  const blogpostSchema = new mongoose.Schema({
+    title: String,
+    sections: [sectionSchema],
+    author: String,
+    date: { type: Date, default: Date.now }
+  });
+  
+  const Blogpost = mongoose.model('Blogpost', blogpostSchema);
 
 app.post('/blogposts', async (req, res) => {
   try {
@@ -44,6 +56,22 @@ app.get('/blogposts', async (req, res) => {
       res.status(500).send(error.message);
     }
 });
+
+app.get('/blogposts/:id', async (req, res) => {
+  try {
+    const blogpostId = req.params.id;
+    const blogpost = await Blogpost.findById(blogpostId);
+
+    if (!blogpost) {
+      return res.status(404).send('Blogpost nicht gefunden.');
+    }
+
+    res.status(200).json(blogpost);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
 
   app.delete('/blogposts/:id', async (req, res) => {
     try {
