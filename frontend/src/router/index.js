@@ -19,7 +19,10 @@ const router = createRouter({
     },{
       path: '/blogposts/:id',
       component: () => import('../components/showBlog.vue'),
-    },
+    },{
+      path: '/user-profile',
+      component: () => import('../components/UserProfil.vue'),
+    }
        
    
     

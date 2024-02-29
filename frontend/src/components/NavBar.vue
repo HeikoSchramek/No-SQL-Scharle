@@ -5,31 +5,41 @@
         <li>
           <router-link to="/">Home</router-link>
         </li>
-        <li>
+        <li v-if="isLoggedIn">
           <router-link to="/create">Anlegen</router-link>
         </li>
         <li>
           <router-link to="/search">Suchen</router-link>
         </li>
-        
+        <li v-if="isLoggedIn">
+          <router-link to="/user-profile">Mein Profil</router-link>
+        </li>
       </ul>
-      <!-- Login-Button auf der rechten Seite -->
-      <button class="login-btn" @click="navigateToLogin">Login</button>
+      
+      <button class="login-btn" @click="handleAuthAction">
+        {{ isLoggedIn ? 'Logout' : 'Login' }}
+      </button>
     </nav>
   </header>
 </template>
 
 <script setup>
 import { useRouter } from 'vue-router';
+import { isLoggedIn, setLoginStatus } from '../components/auth.js'; // Pfad zu auth.js anpassen
 
-// Router-Instanz verwenden
 const router = useRouter();
 
-// Funktion, um zur Login-Seite zu navigieren
-const navigateToLogin = () => {
-  router.push('/login');
+const handleAuthAction = () => {
+  if (isLoggedIn.value) {
+    setLoginStatus(false); // Setzt den Anmeldestatus auf false und aktualisiert sessionStorage
+    router.push('/login');
+  } else {
+    router.push('/login');
+  }
 };
 </script>
+
+
 
 <style scoped>
 header {
