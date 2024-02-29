@@ -29,24 +29,50 @@ mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true })
     }
   });
   
+  const commentSchema = new mongoose.Schema({
+    userId: mongoose.Schema.Types.ObjectId,
+    username: String,
+    comment: String,
+    date: { type: Date, default: Date.now }
+  });
+  
+  const likeSchema = new mongoose.Schema({
+    userId: mongoose.Schema.Types.ObjectId
+  });
+  
   const blogpostSchema = new mongoose.Schema({
     title: String,
     sections: [sectionSchema],
     author: String,
-    date: { type: Date, default: Date.now }
+    authorId: mongoose.Schema.Types.ObjectId,
+    date: { type: Date, default: Date.now },
+    comments: [commentSchema], // Hinzufügen von Kommentaren
+    likes: [likeSchema] // Hinzufügen von Likes
   });
+  
+  
   
   const Blogpost = mongoose.model('Blogpost', blogpostSchema);
 
-app.post('/blogposts', async (req, res) => {
-  try {
-    const blogpost = new Blogpost(req.body);
-    const result = await blogpost.save();
-    res.status(201).send(result);
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
-});
+  app.post('/blogposts', async (req, res) => {
+    try {
+      // Korrektur: von "authorID" zu "authorId"
+      const blogpost = new Blogpost({
+        title: req.body.title,
+        sections: req.body.sections,
+        author: req.body.author, // Autor-Name
+        authorId: req.body.authorId, // Autor-ID, korrigiert
+        date: req.body.date
+      });
+      const result = await blogpost.save();
+      res.status(201).send(result);
+    } catch (error) {
+      res.status(500).send(error.message);
+    }
+  });
+  
+  
+  
 
 app.get('/blogposts', async (req, res) => {
     try {
@@ -107,16 +133,18 @@ app.put('/blogposts/:id', async (req, res) => {
 
 app.post('/login', async (req, res) => {
   const user = await User.findOne({ email: req.body.email });
-  if (user) {
-    if (req.body.password === user.password) {
-      res.json({ message: 'Erfolgreich eingeloggt', role: user.role, userId: user._id }); // userId zurückgeben
-    } else {
-      res.status(400).json({ message: 'Passwort ist falsch' });
-    }
+  if (user && req.body.password === user.password) {
+    res.json({
+      message: 'Erfolgreich eingeloggt',
+      role: user.role,
+      userId: user._id,
+      name: user.name // Name des Benutzers zurückgeben
+    });
   } else {
-    res.status(404).json({ message: 'Benutzer nicht gefunden' });
+    res.status(400).json({ message: 'Anmeldung fehlgeschlagen' });
   }
 });
+
 
 
 app.post('/users', (req, res) => {
@@ -142,6 +170,72 @@ app.get('/users/:id', async (req, res) => {
   }
 });
 
+
+app.get('/blogposts/search', async (req, res) => {
+  const searchTerm = req.query.term;
+  try {
+    const searchResult = await Blogpost.find({
+      title: { $regex: searchTerm, $options: 'i' } // 'i' steht für case-insensitive
+    });
+
+    if (!searchResult || searchResult.length === 0) {
+      return res.status(404).send('Keine Blogposts gefunden.');
+    }
+
+    res.status(200).json(searchResult);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+app.post('/blogposts/:id/comments', async (req, res) => {
+  const { id } = req.params;
+  const { userId, username, comment } = req.body;
+
+  try {
+    const blogpost = await Blogpost.findById(id);
+
+    if (!blogpost) {
+      return res.status(404).send('Blogpost nicht gefunden.');
+    }
+
+    blogpost.comments.push({ userId, username, comment });
+    await blogpost.save();
+
+    res.status(201).json(blogpost);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+app.post('/blogposts/:id/likes', async (req, res) => {
+  const { id } = req.params;
+  const { userId } = req.body;
+
+  try {
+    const blogpost = await Blogpost.findById(id);
+
+    if (!blogpost) {
+      return res.status(404).send('Blogpost nicht gefunden.');
+    }
+
+    const existingLikeIndex = blogpost.likes.findIndex(like => like.userId.equals(userId));
+
+    if (existingLikeIndex > -1) {
+      // Like entfernen
+      blogpost.likes.splice(existingLikeIndex, 1);
+    } else {
+      // Like hinzufügen
+      blogpost.likes.push({ userId });
+    }
+
+    await blogpost.save();
+
+    res.status(200).json(blogpost);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
 
 
 async function createUser(req, res, role) {
