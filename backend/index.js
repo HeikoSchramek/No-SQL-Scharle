@@ -106,24 +106,41 @@ app.put('/blogposts/:id', async (req, res) => {
 });
 
 app.post('/login', async (req, res) => {
-  // Benutzer anhand der E-Mail finden
   const user = await User.findOne({ email: req.body.email });
   if (user) {
-    // Überprüfen des Passworts (im Klartext)
     if (req.body.password === user.password) {
-      res.send('Erfolgreich eingeloggt');
+      res.json({ message: 'Erfolgreich eingeloggt', role: user.role, userId: user._id }); // userId zurückgeben
     } else {
-      res.status(400).send('Passwort ist falsch');
+      res.status(400).json({ message: 'Passwort ist falsch' });
     }
   } else {
-    res.status(404).send('Benutzer nicht gefunden');
+    res.status(404).json({ message: 'Benutzer nicht gefunden' });
   }
 });
+
 
 app.post('/users', (req, res) => {
   createUser(req, res, 'User');
 });  
   
+// Neuer Endpunkt, um Benutzerdaten abzurufen
+app.get('/users/:id', async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).send('Benutzer nicht gefunden.');
+    }
+
+    // Ggf. sensible Informationen entfernen
+    user.password = undefined;
+
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
 
 
 
