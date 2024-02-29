@@ -18,12 +18,12 @@
           </div>
           <button type="button" @click="removeSection(index)">Abschnitt entfernen</button>
         </div>
+        <div class="buttons">
+          <button type="button" @click="addSubheading">Unterüberschrift hinzufügen</button>
+          <button type="button" @click="addTextField">Textfeld hinzufügen</button>
+          <button type="submit">Beitrag erstellen</button>
+        </div>
       </form>
-      <div class="buttons">
-        <button type="button" @click="addSubheading">Unterüberschrift hinzufügen</button>
-        <button type="button" @click="addTextField">Textfeld hinzufügen</button>
-        <button type="submit" @click="submitPost">Beitrag erstellen</button>
-      </div>
     </div>
   </div>
 </template>
@@ -49,25 +49,34 @@ export default {
       this.post.sections.splice(index, 1);
     },
     async submitPost() {
-      try {
-        const response = await fetch('http://localhost:3000/blogposts', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(this.post)
-        });
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        await response.json(); // Wenn das Backend eine Antwort sendet
-        alert('Der Blogbeitrag wurde erfolgreich erstellt!');
-        this.resetForm();
-      } catch (error) {
-        console.error('Es gab einen Fehler beim Erstellen des Blogbeitrags:', error);
-        alert('Fehler beim Erstellen des Blogbeitrags.');
-      }
-    },
+  try {
+    // Den Namen und die ID des Autors aus dem sessionStorage holen
+    const authorName = sessionStorage.getItem('name');
+    const authorId = sessionStorage.getItem('userId'); // Korrekt abrufen der Benutzer-ID
+    const requestBody = { ...this.post, author: authorName, authorId: authorId }; // Benutzer-ID zum Anfragekörper hinzufügen
+
+
+    const response = await fetch('http://localhost:3000/blogposts', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody)
+    });
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    await response.json(); // Wenn das Backend eine Antwort sendet
+    alert('Der Blogbeitrag wurde erfolgreich erstellt!');
+    this.resetForm();
+  } catch (error) {
+    console.error('Es gab einen Fehler beim Erstellen des Blogbeitrags:', error);
+    alert('Fehler beim Erstellen des Blogbeitrags.');
+  }
+}
+
+,
     resetForm() {
       this.post.title = '';
       this.post.sections = [];

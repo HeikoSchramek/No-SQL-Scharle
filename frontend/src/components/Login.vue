@@ -29,34 +29,39 @@ export default {
   },
   methods: {
     async handleLogin() {
-      try {
-        const response = await fetch('http://localhost:3000/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email: this.email,
-            password: this.password,
-          }),
-        });
+  try {
+    const response = await fetch('http://localhost:3000/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: this.email,
+        password: this.password,
+      }),
+    });
 
-        if (!response.ok) {
-          throw new Error('Login fehlgeschlagen');
-        }
+    if (!response.ok) {
+      throw new Error('Login fehlgeschlagen');
+    }
 
-        const data = await response.json();
-        console.log(data.message);
+    const data = await response.json();
+    console.log(data.message);
 
-        setLoginStatus(true);
-        sessionStorage.setItem('userRole', data.role);
-        sessionStorage.setItem('userId', data.userId);
+    setLoginStatus(true);
+    sessionStorage.setItem('userRole', data.role);
+    sessionStorage.setItem('userId', data.userId);
+    sessionStorage.setItem('name', data.name); // Benutzername speichern
 
-        this.$router.push(data.role === 'Admin' ? '/admin-dashboard' : '/user-dashboard');
-      } catch (error) {
-        console.error(error);
-      }
-    },
+    console.log(data);
+    console.log(sessionStorage.getItem('name'));
+
+    this.$router.push(data.role === 'Admin' ? '/admin-dashboard' : '/user-dashboard');
+  } catch (error) {
+    console.error(error);
+  }
+}
+
   },
 }
 </script>

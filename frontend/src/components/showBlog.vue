@@ -1,7 +1,7 @@
 <template>
     <div class="blog-post" v-if="post">
       <h1>{{ post.title }}</h1>
-      <p>{{ formatDate(post.date) }}</p>
+      <p>{{ formatDate(post.date) }}, {{post.author}}</p>
       <div v-for="(section, index) in post.sections" :key="index">
         <h3 v-if="section.type === 'subheading'">{{ section.text }}</h3>
         <p v-if="section.type === 'text'">{{ section.text }}</p>
