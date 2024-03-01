@@ -28,13 +28,21 @@ mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true })
       required: true
     }
   });
+
+  const commentSchema = new mongoose.Schema({
+    text: String,
+    authorUsername: String,
+    date: { type: Date, default: Date.now }
+  });
   
   const blogpostSchema = new mongoose.Schema({
     title: String,
     sections: [sectionSchema],
     author: String,
     authorId: mongoose.Schema.Types.ObjectId, // Stellen Sie sicher, dass dies übereinstimmt
-    date: { type: Date, default: Date.now }
+    date: { type: Date, default: Date.now },
+    likes: { type: Number, default: 0 },
+    comments: [commentSchema]
   });
   
   
@@ -174,6 +182,35 @@ app.get('/blogposts/search', async (req, res) => {
     res.status(500).send(error.message);
   }
 });
+
+// Like a blogpost
+app.post('/blogposts/:id/like', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const blogpost = await Blogpost.findByIdAndUpdate(id, { $inc: { likes: 1 } }, { new: true });
+    if (!blogpost) return res.status(404).send('Blogpost nicht gefunden.');
+    res.status(200).json(blogpost);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+// Add a comment to a blogpost
+app.post('/blogposts/:id/comment', async (req, res) => {
+  const { id } = req.params;
+  const { text, authorUsername } = req.body; // Überprüfe, ob diese Werte wie erwartet empfangen werden
+  try {
+    const blogpost = await Blogpost.findById(id);
+    if (!blogpost) return res.status(404).send('Blogpost nicht gefunden.');
+    blogpost.comments.unshift({ text, authorUsername }); // Füge neuen Kommentar hinzu
+    await blogpost.save();
+    res.status(200).json(blogpost);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+
 
 
 
