@@ -3,6 +3,7 @@
       <h2>Benutzerprofil</h2>
       <p>Email: {{ userProfile.email }}</p>
       <p>Name: {{ userProfile.name }}</p>
+      <p>Username: {{ userProfile.username }}</p>
       <p>Adresse: {{ userProfile.address }}</p>
       <!-- Fügen Sie hier weitere Benutzerinformationen hinzu -->
     </div>

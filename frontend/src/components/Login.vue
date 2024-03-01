@@ -51,7 +51,8 @@ export default {
     setLoginStatus(true);
     sessionStorage.setItem('userRole', data.role);
     sessionStorage.setItem('userId', data.userId);
-    sessionStorage.setItem('name', data.name); // Benutzername speichern
+    sessionStorage.setItem('name', data.name);
+    sessionStorage.setItem('username', data.username); // Benutzername speichern
 
     console.log(data);
     console.log(sessionStorage.getItem('name'));

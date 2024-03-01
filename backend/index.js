@@ -29,25 +29,12 @@ mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true })
     }
   });
   
-  const commentSchema = new mongoose.Schema({
-    userId: mongoose.Schema.Types.ObjectId,
-    username: String,
-    comment: String,
-    date: { type: Date, default: Date.now }
-  });
-  
-  const likeSchema = new mongoose.Schema({
-    userId: mongoose.Schema.Types.ObjectId
-  });
-  
   const blogpostSchema = new mongoose.Schema({
     title: String,
     sections: [sectionSchema],
     author: String,
-    authorId: mongoose.Schema.Types.ObjectId,
-    date: { type: Date, default: Date.now },
-    comments: [commentSchema], // Hinzufügen von Kommentaren
-    likes: [likeSchema] // Hinzufügen von Likes
+    authorId: mongoose.Schema.Types.ObjectId, // Stellen Sie sicher, dass dies übereinstimmt
+    date: { type: Date, default: Date.now }
   });
   
   
@@ -188,54 +175,6 @@ app.get('/blogposts/search', async (req, res) => {
   }
 });
 
-app.post('/blogposts/:id/comments', async (req, res) => {
-  const { id } = req.params;
-  const { userId, username, comment } = req.body;
-
-  try {
-    const blogpost = await Blogpost.findById(id);
-
-    if (!blogpost) {
-      return res.status(404).send('Blogpost nicht gefunden.');
-    }
-
-    blogpost.comments.push({ userId, username, comment });
-    await blogpost.save();
-
-    res.status(201).json(blogpost);
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
-});
-
-app.post('/blogposts/:id/likes', async (req, res) => {
-  const { id } = req.params;
-  const { userId } = req.body;
-
-  try {
-    const blogpost = await Blogpost.findById(id);
-
-    if (!blogpost) {
-      return res.status(404).send('Blogpost nicht gefunden.');
-    }
-
-    const existingLikeIndex = blogpost.likes.findIndex(like => like.userId.equals(userId));
-
-    if (existingLikeIndex > -1) {
-      // Like entfernen
-      blogpost.likes.splice(existingLikeIndex, 1);
-    } else {
-      // Like hinzufügen
-      blogpost.likes.push({ userId });
-    }
-
-    await blogpost.save();
-
-    res.status(200).json(blogpost);
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
-});
 
 
 async function createUser(req, res, role) {
