@@ -8,17 +8,14 @@
     </div>
     <div class="likes-comments">
       <button @click="likePost" v-if="isLoggedIn">Like ({{ post.likes }})</button>
-      <div class="comments">
+      <div class="comments" v-if="isLoggedIn">
         <h3>Kommentare:</h3>
-        <div v-if="isLoggedIn">
-          <textarea v-model="newCommentText" placeholder="Schreibe einen Kommentar..."></textarea>
-          <button @click="addComment">Kommentieren</button>
-          <p></p>
-        </div>
+        <textarea v-model="newCommentText" placeholder="Schreibe einen Kommentar..." v-if="isLoggedIn"></textarea>
+        <button @click="addComment" v-if="isLoggedIn">Kommentieren</button>
+        <p></p>
         <div v-for="(comment, index) in post.comments" :key="index" class="comment">
           <p><strong>{{ comment.authorUsername }}:</strong> {{ comment.text }} ({{ formatDate(comment.date) }})</p>
         </div>
-        
       </div>
     </div>
   </div>
@@ -49,7 +46,7 @@ export default {
     });
 
     async function likePost() {
-      try {
+        try {
         const response = await fetch(`http://localhost:3000/blogposts/${post.value._id}/like`, { method: 'POST' });
         if (!response.ok) throw new Error('Fehler beim Liken des Blogbeitrags');
         post.value.likes += 1; // Optimistisch die Anzahl der Likes erhöhen
@@ -59,32 +56,28 @@ export default {
     }
 
     async function addComment() {
-  // Prüfen, ob der Username korrekt aus dem sessionStorage gelesen wird
-  console.log("Aktueller Username: ", sessionStorage.getItem('username'));
+      const authorUsername = sessionStorage.getItem('username');
+      if (!authorUsername) {
+        alert('Sie müssen angemeldet sein, um Kommentare zu hinterlassen.');
+        return;
+      }
+      const commentData = { text: newCommentText.value, authorUsername };
 
-  try {
-    const authorUsername = sessionStorage.getItem('username');
-    const commentData = { text: newCommentText.value, authorUsername };
+      try {
+        const response = await fetch(`http://localhost:3000/blogposts/${post.value._id}/comment`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(commentData),
+        });
 
-    // Überprüfen der Daten, die gesendet werden
-    console.log("Sende Kommentardaten: ", commentData);
-
-    const response = await fetch(`http://localhost:3000/blogposts/${post.value._id}/comment`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(commentData),
-    });
-
-    if (!response.ok) throw new Error('Fehler beim Hinzufügen des Kommentars');
-    const updatedPost = await response.json();
-    post.value = updatedPost;
-    newCommentText.value = ''; // Textfeld leeren
-  } catch (error) {
-    console.error('Fehler beim Hinzufügen des Kommentars:', error);
-  }
-}
-
-
+        if (!response.ok) throw new Error('Fehler beim Hinzufügen des Kommentars');
+        const updatedPost = await response.json();
+        post.value = updatedPost;
+        newCommentText.value = ''; // Textfeld leeren
+      } catch (error) {
+        console.error('Fehler beim Hinzufügen des Kommentars:', error);
+      }
+    }
 
     return { post, newCommentText, likePost, addComment, isLoggedIn };
   },
@@ -95,6 +88,7 @@ export default {
   }
 };
 </script>
+
 
 <style scoped>
 .blog-post {

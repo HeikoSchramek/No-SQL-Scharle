@@ -20,6 +20,7 @@
 
 <script>
 import { setLoginStatus } from '../components/auth.js'; // Pfad zu auth.js anpassen
+
 export default {
   data() {
     return {
@@ -29,40 +30,42 @@ export default {
   },
   methods: {
     async handleLogin() {
-  try {
-    const response = await fetch('http://localhost:3000/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email: this.email,
-        password: this.password,
-      }),
-    });
+      try {
+        const response = await fetch('http://localhost:3000/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: this.email,
+            password: this.password,
+          }),
+        });
 
-    if (!response.ok) {
-      throw new Error('Login fehlgeschlagen');
-    }
+        if (!response.ok) {
+          throw new Error('Login fehlgeschlagen');
+        }
 
-    const data = await response.json();
-    console.log(data.message);
+        const data = await response.json();
 
-    setLoginStatus(true);
-    sessionStorage.setItem('userRole', data.role);
-    sessionStorage.setItem('userId', data.userId);
-    sessionStorage.setItem('name', data.name);
-    sessionStorage.setItem('username', data.username); // Benutzername speichern
+        setLoginStatus(true);
+        sessionStorage.setItem('userRole', data.role);
+        sessionStorage.setItem('userId', data.userId);
+        sessionStorage.setItem('name', data.name);
+        sessionStorage.setItem('username', data.username);
 
-    console.log(data);
-    console.log(sessionStorage.getItem('name'));
-
-    this.$router.push(data.role === 'Admin' ? '/admin-dashboard' : '/user-dashboard');
-  } catch (error) {
-    console.error(error);
-  }
-}
-
+        // Dynamische Weiterleitung basierend auf der Nutzerrolle
+        let redirectTo = '/user-dashboard'; // Standard-Redirect
+        if (data.role === 'Admin') {
+          redirectTo = '/admin-dashboard';
+        } else if (data.role === 'Developer') {
+          redirectTo = '/developer-dashboard'; // Gehe davon aus, dass es eine Developer-Dashboard-Route gibt
+        }
+        this.$router.push(redirectTo);
+      } catch (error) {
+        console.error(error);
+      }
+    },
   },
 }
 </script>
