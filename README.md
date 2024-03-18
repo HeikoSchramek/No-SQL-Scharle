@@ -11,6 +11,6 @@
 10) Den Docker-Container über 'docker compose up' starten
 11) Neues Terminal öffnen
 12) In das Verzeichnis ./frontend navigieren
-13) Alle Projektabhängigkeiten des Backends über 'npm install' installieren
+13) Alle Projektabhängigkeiten des Frontends über 'npm install' installieren
 14) Den Vue-Entwicklungsserver über 'npm run serve' starten
 15) Den Vue-Entwicklungsserver über den Browser auf der im Terminal angezeigten URL aufrufen
