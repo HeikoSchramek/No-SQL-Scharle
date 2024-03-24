@@ -1,19 +1,24 @@
 <template>
-  <div class="search-container">
-    <div class="search-bar">
-      <input type="text" v-model="searchTerm" @input="debounceSearch" placeholder="Suche nach Titel oder Autor..." class="search-input">
-      <button @click="fetchBlogposts" class="search-button">Suchen</button>
-    </div>
-    <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
-    <div class="blogposts-container">
-      <div v-for="post in blogposts" :key="post._id" class="blogpost-card">
-        <h3>{{ post.title }}</h3>
-        <p>Verfasst von {{ post.author }} am {{ new Date(post.date).toLocaleDateString() }}</p>
-        <!-- Weitere Details des Blogposts hier anzeigen -->
+  <div class="container">
+    <h1 class="title">Blogposts durchsuchen</h1>
+    <div class="content-container">
+      <form @submit.prevent="fetchBlogposts" class="blog-form">
+        <div class="input-group">
+          <input type="text" v-model="searchTerm" placeholder="Suche nach Titel oder Autor..." class="form-input">
+          <button type="submit" class="btn">Suchen</button>
+        </div>
+      </form>
+      <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+      <div class="blogposts-container">
+        <div v-for="post in blogposts" :key="post._id" class="section card" @click="redirectToPost(post._id)">
+          <h3>{{ post.title }}</h3>
+          <p>Verfasst von {{ post.author }} am {{ new Date(post.date).toLocaleDateString() }}</p>
+        </div>
       </div>
     </div>
   </div>
 </template>
+
 
 <script>
 export default {
@@ -22,16 +27,9 @@ export default {
       searchTerm: '',
       blogposts: [],
       errorMessage: '',
-      debounceTimer: null,
     };
   },
   methods: {
-    debounceSearch() {
-      clearTimeout(this.debounceTimer);
-      this.debounceTimer = setTimeout(() => {
-        this.fetchBlogposts();
-      }, 500); // Verzögert die Suchanfrage um 500 ms
-    },
     async fetchBlogposts() {
       console.log(`Suche nach: ${this.searchTerm}`);
       if (this.searchTerm.trim() === '') {
@@ -44,6 +42,11 @@ export default {
       try {
         const response = await fetch(url);
         if (!response.ok) {
+          if (response.status === 404) {
+            this.blogposts = [];
+            this.errorMessage = 'Keine Blogposts gefunden.';
+            return;
+          }
           throw new Error(`Fehler beim Abrufen der Blogposts: ${response.statusText}`);
         }
         const data = await response.json();
@@ -54,58 +57,98 @@ export default {
         this.errorMessage = 'Fehler beim Abrufen der Blogposts. Bitte versuche es später erneut.';
       }
     },
+    redirectToPost(postId) {
+      this.$router.push(`/blogposts/${postId}`);
+    },
   }
 }
 </script>
 
 
-  
-  <style>
-  .search-bar {
+<style scoped>
+.container {
+max-width: 800px;
+margin: auto;
+padding: 20px;
+box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+}
+
+.title {
+  margin-bottom: 20px;
+  text-align: center;
+  color: #333;
+}
+
+.content-container {
+  margin-top: 20px;
+}
+
+.blog-form {
+  margin-bottom: 20px;
+}
+
+.input-group {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  max-width: 600px; /* Anpassen nach Bedarf */
-  margin: 0 auto;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 20px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.search-input {
-  flex-grow: 1;
-  margin-right: 10px;
-  padding: 10px;
-  border: none;
-  border-radius: 20px;
+.form-input {
+  flex: 1;
+  padding: 8px;
   font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px 0 0 4px;
 }
 
-.search-input:focus {
-  outline: none;
-}
-
-.search-button {
-  padding: 10px 20px;
-  background-color: #007bff;
+.btn {
+  padding: 8px 15px;
+  font-size: 16px;
+  background-color: #5c5d5e;
   color: white;
   border: none;
-  border-radius: 20px;
+  border-radius: 0 4px 4px 0;
   cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.2s, transform 0.2s;
 }
 
-.search-button:hover {
-  background-color: #0056b3;
-  transform: scale(1.05);
+.btn:hover {
+  background-color: #515152;
 }
 
-.search-button:focus {
-  outline: none;
+.error-message {
+  color: #ff0000;
+  margin-top: 10px;
 }
 
-  </style>
-  
+.blogposts-container {
+  display: grid;
+  grid-template-columns: 1fr; /* Jede Karte in einer eigenen Spalte */
+  gap: 20px;
+}
+
+.section {
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 15px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+.section:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h3 {
+  margin: 0 0 10px;
+  font-size: 20px;
+}
+
+p {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.blogpost-description {
+  font-style: italic;
+}
+</style>

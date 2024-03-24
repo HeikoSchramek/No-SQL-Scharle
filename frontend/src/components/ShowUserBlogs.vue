@@ -1,15 +1,24 @@
 <template>
-    <div class="user-blogposts">
-      <div v-for="post in blogPosts" :key="post._id" class="blog-post">
-        <h3>{{ post.title }}</h3>
-        <p>{{ post.content }}</p>
-        <!-- Button zum Bearbeiten -->
-        <router-link :to="{ path: `/editBlog/${post._id}` }">Bearbeiten</router-link>
-        <!-- Button zum Löschen -->
-        <button @click="deletePost(post._id)">Löschen</button>
+  <div class="container">
+    <h1 class="title">Meine Blogbeiträge</h1>
+    <!-- Hinweis, falls keine Beiträge vorhanden sind -->
+    <p v-if="blogPosts.length === 0" class="no-posts">Keine Blogbeiträge gefunden. Beginne damit, deinen ersten Beitrag zu erstellen.</p>
+    <div v-for="post in blogPosts" :key="post._id" class="section card">
+      <h3>{{ post.title }}</h3>
+      <p>{{ post.content }}</p>
+      <div class="button-group">
+        <router-link :to="{ path: `/editBlog/${post._id}` }" class="btn">Bearbeiten</router-link>
+        <button @click="deletePost(post._id)" class="btn-remove">Löschen</button>
       </div>
     </div>
-  </template>
+  </div>
+</template>
+
+
+
+
+
+
   
   <script>
   export default {
@@ -44,47 +53,96 @@
     }
   }
   </script>
-  
-  <style>
-  .user-blogposts {
-    max-width: 800px;
-    margin: auto;
-  }
-  
-  .blog-post {
-    border-bottom: 1px solid #ccc;
-    padding-bottom: 20px;
-    margin-bottom: 20px;
-  }
-  
-  .blog-post h3 {
-    color: #333;
-  }
-  
-  .blog-post p {
-    color: #666;
-  }
-  
-  button {
-    background-color: #f44336;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  button:hover {
-    opacity: 0.9;
-  }
-  
-  .router-link {
-    text-decoration: none;
-    color: #2196F3;
-  }
-  
-  .router-link:hover {
-    text-decoration: underline;
-  }
-  </style>
-  
+ 
+ <style scoped>
+.container {
+max-width: 800px;
+margin: auto;
+padding: 20px;
+box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+}
+
+.title {
+  margin-bottom: 20px;
+  text-align: center;
+  color: #333;
+}
+
+.no-posts {
+  color: #666;
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* Angepasster Stil für den Blog-Beitragscontainer */
+.section.card {
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 15px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+h3, p {
+  margin: 10px 0; /* Gibt Abstand zwischen Elementen */
+}
+
+/* Stil für die Labels, ähnlich wie .profile-label im Benutzerprofil */
+h3 {
+  font-weight: bold;
+  color: #333;
+}
+
+p {
+  color: #666;
+}
+
+.button-group {
+  display: flex;
+  justify-content: flex-end; /* Buttons am rechten Rand ausrichten */
+  margin-top: 10px;
+}
+
+.btn, .btn-remove {
+  cursor: pointer;
+  padding: 8px 15px;
+  font-size: 14px;
+  color: #f8f9fa;
+  border: none;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+  margin-left: 10px; /* Abstand zwischen den Buttons */
+  text-decoration: none;
+}
+
+.btn {
+  background-color: #5c5d5e;
+}
+
+.btn:hover {
+  background-color: #515152;
+}
+
+.btn-remove {
+  background-color: #5c5d5e;
+}
+
+.btn-remove:hover {
+  background-color: #515152;
+}
+
+.router-link {
+  display: inline-block;
+  background-color: #5c5d5e;
+  color: white;
+  text-decoration: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  margin-top: 10px;
+}
+
+.router-link:hover {
+  background-color: #515152;
+}
+</style>

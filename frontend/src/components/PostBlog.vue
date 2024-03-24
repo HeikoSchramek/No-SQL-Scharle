@@ -1,27 +1,27 @@
 <template>
   <div class="container">
-    <h1>Erstelle einen Blogbeitrag</h1>
+    <h1 class="title">Blogbeitrag bearbeiten</h1>
     <div class="content-container">
-      <form @submit.prevent="submitPost" class="blog-form">
-        <div>
-          <label for="title">Titel:</label>
-          <input id="title" v-model="post.title" type="text" required>
+      <form @submit.prevent="submitUpdate" class="blog-form">
+        <div class="input-group">
+          <label for="title" class="form-label">Titel:</label>
+          <input id="title" v-model="post.title" type="text" class="form-input" required>
         </div>
-        <div v-for="(section, index) in post.sections" :key="index" class="section">
-          <div v-if="section.type === 'subheading'">
-            <label>Unterüberschrift:</label>
-            <input v-model="section.text" type="text" required>
+        <div v-for="(section, index) in post.sections" :key="index" class="section card">
+          <div v-if="section.type === 'subheading'" class="input-group">
+            <label class="form-label">Unterüberschrift:</label>
+            <input v-model="section.text" type="text" class="form-input" required>
           </div>
-          <div v-if="section.type === 'text'">
-            <label>Text:</label>
-            <textarea v-model="section.text" required></textarea>
+          <div v-if="section.type === 'text'" class="input-group">
+            <label class="form-label">Text:</label>
+            <textarea v-model="section.text" class="form-textarea" required></textarea>
           </div>
-          <button type="button" @click="removeSection(index)">Abschnitt entfernen</button>
+          <button type="button" @click="removeSection(index)" class="btn-remove">Abschnitt entfernen</button>
         </div>
         <div class="buttons">
-          <button type="button" @click="addSubheading">Unterüberschrift hinzufügen</button>
-          <button type="button" @click="addTextField">Textfeld hinzufügen</button>
-          <button type="submit">Beitrag erstellen</button>
+          <button type="button" @click="addSubheading" class="btn">Unterüberschrift hinzufügen</button>
+          <button type="button" @click="addTextField" class="btn">Textfeld hinzufügen</button>
+          <button type="submit" class="btn btn-submit">Änderungen speichern</button>
         </div>
       </form>
     </div>
@@ -86,60 +86,84 @@ export default {
 </script>
 
 <style scoped>
+/* Der CSS-Code aus deinem zweiten Beispiel kann hier direkt übernommen werden, da du denselben Stil verwenden möchtest. */
 .container {
   max-width: 800px;
   margin: auto;
   padding: 20px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
 }
 
-.content-container {
+.title {
+  margin-bottom: 20px;
+  text-align: center;
+  color: #333;
+}
+
+.content-container, .blog-form, .input-group {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
 }
 
-.blog-form {
-  flex-grow: 1;
-  margin-right: 20px;
+.input-group:not(:last-child) {
+  margin-bottom: 15px;
+}
+
+.form-label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.form-input, .form-textarea {
+  padding: 8px;
+  border: 2px solid #515152;
+  border-radius: 4px;
+  transition: border-color 0.3s ease-in-out;
+}
+
+.form-input:focus, .form-textarea:focus {
+  border-color: #515152;
 }
 
 .buttons {
   display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
+  justify-content: space-between;
+  margin-top: 20px;
 }
 
-button {
+.btn {
   cursor: pointer;
-  margin-bottom: 10px;
-  padding: 10px 20px;
-  font-size: 16px;
+  padding: 8px 15px;
+  font-size: 14px;
   color: white;
-  background-color: #007bff;
+  background-color: #5c5d5e;
   border: none;
   border-radius: 4px;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.2s ease;
 }
 
-button:hover {
-  background-color: #0056b3;
+.btn:hover {
+  background-color: #515152;
 }
 
-input[type="text"],
-textarea {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 10px;
-  border: 1px solid #ccc;
+.btn-remove {
+  padding: 5px 10px;
+  font-size: 12px;
+  margin-top: 10px;
+  align-self: flex-end;
+  background-color: #da6873;
   border-radius: 4px;
 }
 
-textarea {
-  resize: vertical;
-  min-height: 100px;
+.card {
+  padding: 15px;
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.section {
+.section:not(:last-child) {
   margin-bottom: 20px;
 }
 </style>

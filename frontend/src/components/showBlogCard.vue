@@ -37,33 +37,42 @@
   </script>
   
   <style scoped>
-  .blog-posts {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
-  }
-  
-  .post-card {
-    cursor: pointer;
-    border: 1px solid #ccc;
-    padding: 20px;
-    border-radius: 8px;
-    width: 300px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    transition: transform 0.2s ease;
-  }
-  
-  .post-card:hover {
-    transform: translateY(-5px);
-  }
-  
-  h2, p {
-    margin: 0;
-  }
-  
-  h2 {
-    margin-bottom: 10px;
-  }
-  </style>
-  
+.blog-posts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  padding: 20px;
+}
+
+.post-card {
+  cursor: pointer;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 340px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.post-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+}
+
+.post-title, .post-date {
+  color: #333;
+}
+
+.post-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.post-date {
+  font-size: 0.9rem;
+  color: #666;
+}
+</style>

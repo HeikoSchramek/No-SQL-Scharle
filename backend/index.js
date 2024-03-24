@@ -66,7 +66,29 @@ mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true })
     }
   });
   
+  app.get('/blogposts/search', async (req, res) => {
+    try {
+      const { term } = req.query;
+      const regex = new RegExp(term, 'i'); // 'i' für case-insensitive Suche
   
+      const blogposts = await Blogpost.find({
+        $or: [
+          { title: { $regex: regex } },
+          { author: { $regex: regex } }
+        ]
+      });
+  
+      if (!blogposts.length) {
+        return res.status(404).json({ message: 'Keine Blogposts gefunden.' });
+      }
+  
+      res.json(blogposts);
+    } catch (error) {
+      console.error('Suchfehler:', error);
+      res.status(500).json({ message: 'Fehler bei der Suche nach Blogposts.' });
+    }
+  });
+    
   
 
 app.get('/blogposts', async (req, res) => {
@@ -208,31 +230,6 @@ app.put('/blogposts/:id', async (req, res) => {
     res.status(500).send(error.message);
   }
 });
-
-
-
-app.get('/blogposts/search', async (req, res) => {
-  const searchTerm = req.query.term;
-  try {
-    // Suchen in mehreren Feldern mit $or Operator
-    const searchResult = await Blogpost.find({
-      $or: [
-        { title: { $regex: searchTerm, $options: 'i' } },
-        { author: { $regex: searchTerm, $options: 'i' } }
-      ]
-    });
-
-    if (!searchResult || searchResult.length === 0) {
-      return res.status(404).send('Keine Blogposts gefunden.');
-    }
-
-    res.status(200).json(searchResult);
-  } catch (error) {
-    console.error('Suchfehler:', error);
-    res.status(500).send('Interner Serverfehler bei der Suche');
-  }
-});
-
 
 // Like a blogpost
 app.post('/blogposts/:id/like', async (req, res) => {
