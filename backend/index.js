@@ -109,22 +109,7 @@ app.get('/blogposts/:id', async (req, res) => {
     }
 });
   
-app.put('/blogposts/:id', async (req, res) => {
-    const { id } = req.params;
-    const { title, content, date } = req.body;
-  
-    try {
-      const updatedBlogpost = await Blogpost.findByIdAndUpdate(id, { title, content, date }, { new: true });
-  
-      if (!updatedBlogpost) {
-        return res.status(404).send('Blogeintrag nicht gefunden.');
-      }
-  
-      res.status(200).json(updatedBlogpost);
-    } catch (error) {
-      res.status(500).send(error.message);
-    }
-});
+
 
 app.post('/login', async (req, res) => {
   const user = await User.findOne({ email: req.body.email });
@@ -140,6 +125,24 @@ app.post('/login', async (req, res) => {
   }
 });
 
+// Benutzer aktualisieren
+app.put('/users/:id', async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const updates = req.body;
+
+    // Die Option { new: true } sorgt dafür, dass das aktualisierte Dokument zurückgegeben wird
+    const updatedUser = await User.findByIdAndUpdate(userId, updates, { new: true });
+
+    if (!updatedUser) {
+      return res.status(404).send('Benutzer nicht gefunden.');
+    }
+
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
 
 
 app.post('/users', (req, res) => {
@@ -165,12 +168,58 @@ app.get('/users/:id', async (req, res) => {
   }
 });
 
+app.get('/users', async (req, res) => {
+  try {
+    const users = await User.find().select('-password'); // Passwort nicht einschließen
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+// Route, um alle Blogposts eines spezifischen Benutzers zu finden
+app.get('/blogposts/user/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const userBlogposts = await Blogpost.find({ authorId: userId });
+    if (!userBlogposts) {
+      return res.status(404).send('Keine Blogbeiträge gefunden.');
+    }
+    res.status(200).json(userBlogposts);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+
+app.put('/blogposts/:id', async (req, res) => {
+  try {
+    const blogpostId = req.params.id;
+    const updateData = req.body;
+
+    const updatedBlogpost = await Blogpost.findByIdAndUpdate(blogpostId, updateData, { new: true });
+
+    if (!updatedBlogpost) {
+      return res.status(404).send('Blogbeitrag nicht gefunden.');
+    }
+
+    res.status(200).json(updatedBlogpost);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+
 
 app.get('/blogposts/search', async (req, res) => {
   const searchTerm = req.query.term;
   try {
+    // Suchen in mehreren Feldern mit $or Operator
     const searchResult = await Blogpost.find({
-      title: { $regex: searchTerm, $options: 'i' } // 'i' steht für case-insensitive
+      $or: [
+        { title: { $regex: searchTerm, $options: 'i' } },
+        { author: { $regex: searchTerm, $options: 'i' } }
+      ]
     });
 
     if (!searchResult || searchResult.length === 0) {
@@ -179,9 +228,11 @@ app.get('/blogposts/search', async (req, res) => {
 
     res.status(200).json(searchResult);
   } catch (error) {
-    res.status(500).send(error.message);
+    console.error('Suchfehler:', error);
+    res.status(500).send('Interner Serverfehler bei der Suche');
   }
 });
+
 
 // Like a blogpost
 app.post('/blogposts/:id/like', async (req, res) => {

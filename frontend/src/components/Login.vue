@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import { setLoginStatus } from '../components/auth.js'; // Pfad zu auth.js anpassen
+import { setUser } from './auth.js'; // Stellen Sie sicher, dass der Pfad zu auth.js korrekt ist
 
 export default {
   data() {
@@ -48,28 +48,24 @@ export default {
 
         const data = await response.json();
 
-        setLoginStatus(true);
-        sessionStorage.setItem('userRole', data.role);
-        sessionStorage.setItem('userId', data.userId);
-        sessionStorage.setItem('name', data.name);
-        sessionStorage.setItem('username', data.username);
+        // Setzt den Benutzerstatus mit den erhaltenen Daten
+        setUser(data);
 
         // Dynamische Weiterleitung basierend auf der Nutzerrolle
-        let redirectTo = '/user-dashboard'; // Standard-Redirect
+        let redirectTo = '/'; // Standard-Redirect
         if (data.role === 'Admin') {
-          redirectTo = '/admin-dashboard';
-        } else if (data.role === 'Developer') {
-          redirectTo = '/developer-dashboard'; // Gehe davon aus, dass es eine Developer-Dashboard-Route gibt
+          redirectTo = '/allUser'; // oder eine spezifische Admin-Seite
         }
+        // Keine spezielle Weiterleitung für Entwickler oder normale Benutzer in diesem Beispiel
         this.$router.push(redirectTo);
       } catch (error) {
         console.error(error);
+        alert('Login fehlgeschlagen: Überprüfen Sie Ihre Anmeldeinformationen.');
       }
     },
   },
 }
 </script>
-
 
 <style scoped>
 .login-container {

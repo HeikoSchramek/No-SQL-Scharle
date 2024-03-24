@@ -14,6 +14,12 @@
         <li v-if="isLoggedIn">
           <router-link to="/user-profile">Mein Profil</router-link>
         </li>
+        <li v-if="isAdmin">
+          <router-link to="/allUser">Alle User</router-link>
+        </li>
+        <li v-if="isLoggedIn">
+          <router-link to="/myBlogs">Meine Beiträge</router-link>
+        </li>
       </ul>
       
       <button class="login-btn" @click="handleAuthAction">
@@ -24,14 +30,15 @@
 </template>
 
 <script setup>
+import { computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { isLoggedIn, setLoginStatus } from '../components/auth.js'; // Pfad zu auth.js anpassen
+import { isLoggedIn, logout, isAdmin } from '../components/auth.js'; // Pfad zu auth.js anpassen, wenn nötig
 
 const router = useRouter();
 
 const handleAuthAction = () => {
   if (isLoggedIn.value) {
-    setLoginStatus(false); // Setzt den Anmeldestatus auf false und aktualisiert sessionStorage
+    logout(); // Nutzt nun die logout Funktion aus auth.js
     router.push('/login');
   } else {
     router.push('/login');
@@ -39,17 +46,15 @@ const handleAuthAction = () => {
 };
 </script>
 
-
-
 <style scoped>
 header {
   background-color: #c1bdbc;
-  padding: 10px 30px; /* Zusammengefasste padding-Anweisung */
+  padding: 10px 30px;
 }
 
 nav {
   display: flex;
-  justify-content: space-between; /* Zentriert die Elemente und gibt ihnen Raum dazwischen */
+  justify-content: space-between;
   align-items: center;
 }
 

@@ -1,47 +1,64 @@
 <template>
-    <div class="search-container">
-      <div class="search-bar">
-        <input type="text" v-model="searchTerm" placeholder="Suche nach Titel..." class="search-input">
-        <button @click="fetchBlogposts" class="search-button">Suchen</button>
-      </div>
-      <div class="blogposts-container">
-        <div v-for="post in blogposts" :key="post._id" class="blogpost-card">
-          <h3>{{ post.title }}</h3>
-          <p>Verfasst von {{ post.author }} am {{ new Date(post.date).toLocaleDateString() }}</p>
-          <!-- Weitere Details des Blogposts hier anzeigen -->
-        </div>
+  <div class="search-container">
+    <div class="search-bar">
+      <input type="text" v-model="searchTerm" @input="debounceSearch" placeholder="Suche nach Titel oder Autor..." class="search-input">
+      <button @click="fetchBlogposts" class="search-button">Suchen</button>
+    </div>
+    <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+    <div class="blogposts-container">
+      <div v-for="post in blogposts" :key="post._id" class="blogpost-card">
+        <h3>{{ post.title }}</h3>
+        <p>Verfasst von {{ post.author }} am {{ new Date(post.date).toLocaleDateString() }}</p>
+        <!-- Weitere Details des Blogposts hier anzeigen -->
       </div>
     </div>
-  </template>
-  
-  
-  <script>
-  export default {
-    data() {
-      return {
-        searchTerm: '',
-        blogposts: []
-      };
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      searchTerm: '',
+      blogposts: [],
+      errorMessage: '',
+      debounceTimer: null,
+    };
+  },
+  methods: {
+    debounceSearch() {
+      clearTimeout(this.debounceTimer);
+      this.debounceTimer = setTimeout(() => {
+        this.fetchBlogposts();
+      }, 500); // Verzögert die Suchanfrage um 500 ms
     },
-    methods: {
-      async fetchBlogposts() {
-        if (this.searchTerm.trim() === '') {
-          this.blogposts = [];
-          return;
-        }
-        try {
-          const response = await fetch(`http://localhost:3000/blogposts/search?term=${encodeURIComponent(this.searchTerm)}`);
-          if (!response.ok) {
-            throw new Error('Fehler beim Abrufen der Blogposts');
-          }
-          this.blogposts = await response.json();
-        } catch (error) {
-          console.error('Fehler beim Abrufen der Blogposts:', error);
-        }
+    async fetchBlogposts() {
+      console.log(`Suche nach: ${this.searchTerm}`);
+      if (this.searchTerm.trim() === '') {
+        this.blogposts = [];
+        this.errorMessage = '';
+        return;
       }
-    }
+      const url = `http://localhost:3000/blogposts/search?term=${encodeURIComponent(this.searchTerm)}`;
+      console.log(`Anforderung an: ${url}`);
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`Fehler beim Abrufen der Blogposts: ${response.statusText}`);
+        }
+        const data = await response.json();
+        this.blogposts = data;
+        this.errorMessage = '';
+      } catch (error) {
+        console.error('Fehler beim Abrufen der Blogposts:', error);
+        this.errorMessage = 'Fehler beim Abrufen der Blogposts. Bitte versuche es später erneut.';
+      }
+    },
   }
-  </script>
+}
+</script>
+
+
   
   <style>
   .search-bar {
