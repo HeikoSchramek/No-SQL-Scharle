@@ -85,9 +85,7 @@ export default {
 }
 </script>
 
-<style scoped>
-/* Der CSS-Code aus deinem zweiten Beispiel kann hier direkt übernommen werden, da du denselben Stil verwenden möchtest. */
-.container {
+<style scoped>.container {
   max-width: 800px;
   margin: auto;
   padding: 20px;
@@ -166,4 +164,5 @@ export default {
 .section:not(:last-child) {
   margin-bottom: 20px;
 }
+
 </style>
