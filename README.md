@@ -15,7 +15,8 @@
 14) Alle Projektabhängigkeiten des Frontends über 'npm install' installieren
 15) Den Vue-Entwicklungsserver über 'npm run dev' starten
 16) Den Vue-Entwicklungsserver über den Browser auf der im Terminal angezeigten URL aufrufen
-17) MongoDBCompass starten und mit mongodb://root:root@localhost:27017 verbinden
+17) MongoDBCompass herunterladen 
+18) MongoDBCompass starten und mit mongodb://root:root@localhost:27017 verbinden
 
 
 
