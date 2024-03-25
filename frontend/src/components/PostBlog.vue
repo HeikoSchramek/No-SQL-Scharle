@@ -21,7 +21,7 @@
         <div class="buttons">
           <button type="button" @click="addSubheading" class="btn">Unterüberschrift hinzufügen</button>
           <button type="button" @click="addTextField" class="btn">Textfeld hinzufügen</button>
-          <button type="submit" class="btn btn-submit">Änderungen speichern</button>
+          <button type="submit" @click="submitPost" class="btn btn-submit">Änderungen speichern</button>
         </div>
       </form>
     </div>
