@@ -20,5 +20,12 @@
 19. MongoDBCompass herunterladen und installieren
 20. MongoDBCompass starten und mit mongodb://root:root@localhost:27017 verbinden
 
+# Anmeldeinformationen
+1. Admin-Anmeldung:
+    E-Mail: admin@example.com
+    Passwort: admin
 
+2. User-Anmeldung:
+     E-Mail: user2@example.com
+    Passwort: password2
 
