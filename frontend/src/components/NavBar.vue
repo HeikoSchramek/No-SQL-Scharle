@@ -32,13 +32,13 @@
 <script setup>
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { isLoggedIn, logout, isAdmin } from '../components/auth.js'; // Pfad zu auth.js anpassen, wenn nötig
+import { isLoggedIn, logout, isAdmin } from '../components/auth.js'; 
 
 const router = useRouter();
 
 const handleAuthAction = () => {
   if (isLoggedIn.value) {
-    logout(); // Nutzt nun die logout Funktion aus auth.js
+    logout(); 
     router.push('/login');
   } else {
     router.push('/login');

@@ -88,7 +88,7 @@ export default {
 </script>
 
 <style scoped>
-/* Der CSS-Code aus deinem zweiten Beispiel kann hier direkt übernommen werden, da du denselben Stil verwenden möchtest. */
+
 .container {
   max-width: 800px;
   margin: auto;

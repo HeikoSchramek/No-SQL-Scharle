@@ -15,7 +15,7 @@
 
 <style scoped>
 .site-footer {
-  background-color: #c1bdbc; /* Dunkelgrau für eine elegante Erscheinung */
+  background-color: #c1bdbc; 
   color: #555;
   text-align: center;
   padding: 20px 0;
@@ -33,7 +33,7 @@
 }
 
 .footer-link:hover {
-  color: #a8a8a8; /* Helles Grau für Hover-Effekt */
+  color: #a8a8a8; 
 }
 
 .footer-text {

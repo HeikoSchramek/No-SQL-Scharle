@@ -120,7 +120,7 @@ box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
 
 .blogposts-container {
   display: grid;
-  grid-template-columns: 1fr; /* Jede Karte in einer eigenen Spalte */
+  grid-template-columns: 1fr; 
   gap: 20px;
 }
 

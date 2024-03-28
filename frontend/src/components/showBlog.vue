@@ -40,9 +40,9 @@ export default {
     const route = useRoute();
     const isLoggedIn = ref(sessionStorage.getItem('userId') !== null);
     const hasLiked = ref(false);
-    const authorUsername = ref(''); // Initialisiere eine ref für den Benutzernamen
+    const authorUsername = ref(''); 
 
-    // Methode zum Abrufen der Benutzerdaten basierend auf der userId
+    
     async function fetchUserData(userId) {
       try {
         const response = await fetch(`http://localhost:3000/users/${userId}`);
@@ -50,7 +50,7 @@ export default {
           throw new Error('Fehler beim Laden der Benutzerdaten');
         }
         const userData = await response.json();
-        authorUsername.value = userData.username; // Speichere den Benutzernamen aus der Antwort
+        authorUsername.value = userData.username; 
       } catch (error) {
         console.error('Fehler beim Laden der Benutzerdaten:', error);
       }
@@ -60,7 +60,7 @@ export default {
       const postId = route.params.id;
       const userId = sessionStorage.getItem('userId');
       if (userId) {
-        fetchUserData(userId); // Abrufen der Benutzerdaten
+        fetchUserData(userId); 
       }
       if (postId) {
         try {
@@ -74,8 +74,23 @@ export default {
     });
 
     async function likePost() {
-      // Logik zum Liken des Posts...
-    }
+  if (!post.value._id) return;
+  try {
+    const response = await fetch(`http://localhost:3000/blogposts/${post.value._id}/like`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    if (!response.ok) throw new Error('Fehler beim Liken des Blogposts');
+    const updatedPost = await response.json();
+    post.value.likes = updatedPost.likes; // Aktualisiere die Anzahl der Likes im Vue-Reactive-Post-Objekt
+    hasLiked.value = true; // Setze hasLiked auf true, um zu signalisieren, dass der Benutzer diesen Post geliked hat
+  } catch (error) {
+    console.error('Fehler beim Liken des Blogposts:', error);
+  }
+}
+
 
     async function addComment() {
       if (!authorUsername.value) {
@@ -94,7 +109,7 @@ export default {
         if (!response.ok) throw new Error('Fehler beim Hinzufügen des Kommentars');
         const updatedPost = await response.json();
         post.value = updatedPost;
-        newCommentText.value = ''; // Textfeld leeren
+        newCommentText.value = ''; 
       } catch (error) {
         console.error('Fehler beim Hinzufügen des Kommentars:', error);
       }

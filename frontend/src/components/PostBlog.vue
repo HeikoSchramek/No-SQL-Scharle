@@ -50,10 +50,10 @@ export default {
     },
     async submitPost() {
   try {
-    // Den Namen und die ID des Autors aus dem sessionStorage holen
+    
     const authorName = sessionStorage.getItem('name');
-    const authorId = sessionStorage.getItem('userId'); // Korrekt abrufen der Benutzer-ID
-    const requestBody = { ...this.post, author: authorName, authorId: authorId }; // Benutzer-ID zum Anfragekörper hinzufügen
+    const authorId = sessionStorage.getItem('userId'); 
+    const requestBody = { ...this.post, author: authorName, authorId: authorId }; 
 
 
     const response = await fetch('http://localhost:3000/blogposts', {
@@ -67,7 +67,7 @@ export default {
     if (!response.ok) {
       throw new Error('Network response was not ok');
     }
-    await response.json(); // Wenn das Backend eine Antwort sendet
+    await response.json(); 
     alert('Der Blogbeitrag wurde erfolgreich erstellt!');
     this.resetForm();
   } catch (error) {

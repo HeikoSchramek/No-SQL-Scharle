@@ -7,7 +7,7 @@
         <p><span class="profile-label">Name:</span> {{ userProfile.name }}</p>
         <p><span class="profile-label">Username:</span> {{ userProfile.username }}</p>
         <p><span class="profile-label">Adresse:</span> {{ userProfile.address }}</p>
-        <!-- Fügen Sie hier weitere Benutzerinformationen hinzu -->
+        
       </div>
     </div>
   </div>
@@ -22,7 +22,7 @@ data() {
 },
 async mounted() {
   const userId = sessionStorage.getItem('userId');
-  if (userId) { // Stellen Sie sicher, dass eine userId vorhanden ist
+  if (userId) { 
     try {
       const response = await fetch(`http://localhost:3000/users/${userId}`);
       if (!response.ok) {

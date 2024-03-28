@@ -1,0 +1,51 @@
+[
+    {
+        "email": "test@example.com",
+        "username": "testuser",
+        "password": "password",
+        "name": "Test User",
+        "address": "Test Street 123",
+        "role": "User"
+      },
+      {
+        "email": "admin@example.com",
+        "username": "admin",
+        "password": "admin",
+        "name": "Admin User",
+        "address": "Admin Street 123",
+        "role": "Admin"
+      },
+      {
+        "email": "user2@example.com",
+        "username": "user2",
+        "password": "password2",
+        "name": "User Two",
+        "address": "User Street 234",
+        "role": "User"
+      },
+      {
+        "email": "user3@example.com",
+        "username": "user3",
+        "password": "password3",
+        "name": "User Three",
+        "address": "User Street 345",
+        "role": "User"
+      },
+      {
+        "email": "user4@example.com",
+        "username": "user4",
+        "password": "password4",
+        "name": "User Four",
+        "address": "User Street 456",
+        "role": "User"
+      },
+      {
+        "email": "user5@example.com",
+        "username": "user5",
+        "password": "password5",
+        "name": "User Five",
+        "address": "User Street 567",
+        "role": "User"
+      }
+  ]
+  

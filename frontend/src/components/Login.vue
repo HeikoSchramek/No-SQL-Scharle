@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import { setUser } from './auth.js'; // Stellen Sie sicher, dass der Pfad zu auth.js korrekt ist
+import { setUser } from './auth.js'; 
 
 export default {
   data() {
@@ -48,15 +48,15 @@ export default {
 
         const data = await response.json();
 
-        // Setzt den Benutzerstatus mit den erhaltenen Daten
+       
         setUser(data);
 
-        // Dynamische Weiterleitung basierend auf der Nutzerrolle
-        let redirectTo = '/'; // Standard-Redirect
+        
+        let redirectTo = '/'; 
         if (data.role === 'Admin') {
-          redirectTo = '/allUser'; // oder eine spezifische Admin-Seite
+          redirectTo = '/allUser'; 
         }
-        // Keine spezielle Weiterleitung für Entwickler oder normale Benutzer in diesem Beispiel
+       
         this.$router.push(redirectTo);
       } catch (error) {
         console.error(error);
@@ -99,7 +99,7 @@ label {
   margin: 10px 0 20px 0;
   border-radius: 4px;
   border: 1px solid #ccc;
-  box-sizing: border-box; /* Sicherstellen, dass Padding und Border in der Breite inkludiert sind */
+  box-sizing: border-box; 
 }
 
 .btn-login {

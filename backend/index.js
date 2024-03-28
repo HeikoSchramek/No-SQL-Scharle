@@ -2,48 +2,77 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const fs = require('fs').promises;
 const User = require('../backend/userModel.js');
 const app = express();
 const port = 3000;
 
-// Ersetzen Sie dies mit Ihrer eigenen MongoDB URI
 const mongoUri = 'mongodb://root:root@localhost:27017';
 
 app.use(cors());
-
 app.use(bodyParser.json());
 
-mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('MongoDB verbunden'))
+mongoose.connect(mongoUri)
+  .then(() => {
+    console.log('MongoDB verbunden');
+    initializeDatabase();
+  })
   .catch(err => console.error('MongoDB Verbindungsfehler:', err));
 
-  const sectionSchema = new mongoose.Schema({
-    type: {
-      type: String,
-      required: true,
-      enum: ['subheading', 'text']
-    },
-    text: {
-      type: String,
-      required: true
-    }
-  });
-
-  const commentSchema = new mongoose.Schema({
-    text: String,
-    authorUsername: String,
-    date: { type: Date, default: Date.now }
-  });
+  async function initializeDatabase() {
+    try {
+      await Promise.all([
+        User.deleteMany({}), 
+        Blogpost.deleteMany({}) 
+      ]);
+      console.log('Datenbankdaten wurden gelöscht.');
   
-  const blogpostSchema = new mongoose.Schema({
-    title: String,
-    sections: [sectionSchema],
-    author: String,
-    authorId: mongoose.Schema.Types.ObjectId, // Stellen Sie sicher, dass dies übereinstimmt
-    date: { type: Date, default: Date.now },
-    likes: { type: Number, default: 0 },
-    comments: [commentSchema]
-  });
+      await loadTestData(); 
+    } catch (error) {
+      console.error('Fehler beim Initialisieren der Datenbank:', error);
+    }
+  }
+
+async function loadTestData() {
+  try {
+    const usersData = JSON.parse(await fs.readFile('../backend/users.json', 'utf8'));
+    for (const userData of usersData) {
+      const user = new User(userData);
+      await user.save();
+    }
+    console.log(`${usersData.length} User wurden eingefügt.`);
+    
+    const blogpostsData = JSON.parse(await fs.readFile('../backend/blogposts.json', 'utf8'));
+    for (const blogpostData of blogpostsData) {
+      const blogpost = new Blogpost(blogpostData);
+      await blogpost.save();
+    }
+    console.log(`${blogpostsData.length} Blogposts wurden eingefügt.`);
+  } catch (error) {
+    console.error('Fehler beim Laden der Testdaten:', error);
+  }
+}
+
+const sectionSchema = new mongoose.Schema({
+  type: { type: String, required: true, enum: ['subheading', 'text'] },
+  text: { type: String, required: true }
+});
+
+const commentSchema = new mongoose.Schema({
+  text: String,
+  authorUsername: String,
+  date: { type: Date, default: Date.now }
+});
+
+const blogpostSchema = new mongoose.Schema({
+  title: String,
+  sections: [sectionSchema],
+  author: String,
+  authorId: mongoose.Schema.Types.ObjectId, 
+  date: { type: Date, default: Date.now },
+  likes: { type: Number, default: 0 },
+  comments: [commentSchema]
+});
   
   
   
@@ -51,12 +80,12 @@ mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true })
 
   app.post('/blogposts', async (req, res) => {
     try {
-      // Korrektur: von "authorID" zu "authorId"
+      
       const blogpost = new Blogpost({
         title: req.body.title,
         sections: req.body.sections,
-        author: req.body.author, // Autor-Name
-        authorId: req.body.authorId, // Autor-ID, korrigiert
+        author: req.body.author, 
+        authorId: req.body.authorId,
         date: req.body.date
       });
       const result = await blogpost.save();
@@ -69,7 +98,7 @@ mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true })
   app.get('/blogposts/search', async (req, res) => {
     try {
       const { term } = req.query;
-      const regex = new RegExp(term, 'i'); // 'i' für case-insensitive Suche
+      const regex = new RegExp(term, 'i'); 
   
       const blogposts = await Blogpost.find({
         $or: [
@@ -140,20 +169,20 @@ app.post('/login', async (req, res) => {
       message: 'Erfolgreich eingeloggt',
       role: user.role,
       userId: user._id,
-      name: user.name // Name des Benutzers zurückgeben
+      name: user.name 
     });
   } else {
     res.status(400).json({ message: 'Anmeldung fehlgeschlagen' });
   }
 });
 
-// Benutzer aktualisieren
+
 app.put('/users/:id', async (req, res) => {
   try {
     const userId = req.params.id;
     const updates = req.body;
 
-    // Die Option { new: true } sorgt dafür, dass das aktualisierte Dokument zurückgegeben wird
+    
     const updatedUser = await User.findByIdAndUpdate(userId, updates, { new: true });
 
     if (!updatedUser) {
@@ -171,7 +200,7 @@ app.post('/users', (req, res) => {
   createUser(req, res, 'User');
 });  
   
-// Neuer Endpunkt, um Benutzerdaten abzurufen
+
 app.get('/users/:id', async (req, res) => {
   try {
     const userId = req.params.id;
@@ -181,7 +210,6 @@ app.get('/users/:id', async (req, res) => {
       return res.status(404).send('Benutzer nicht gefunden.');
     }
 
-    // Ggf. sensible Informationen entfernen
     user.password = undefined;
 
     res.status(200).json(user);
@@ -192,14 +220,14 @@ app.get('/users/:id', async (req, res) => {
 
 app.get('/users', async (req, res) => {
   try {
-    const users = await User.find().select('-password'); // Passwort nicht einschließen
+    const users = await User.find().select('-password'); 
     res.status(200).json(users);
   } catch (error) {
     res.status(500).send(error.message);
   }
 });
 
-// Route, um alle Blogposts eines spezifischen Benutzers zu finden
+
 app.get('/blogposts/user/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
@@ -231,7 +259,7 @@ app.put('/blogposts/:id', async (req, res) => {
   }
 });
 
-// Like a blogpost
+
 app.post('/blogposts/:id/like', async (req, res) => {
   const { id } = req.params;
   try {
@@ -243,24 +271,20 @@ app.post('/blogposts/:id/like', async (req, res) => {
   }
 });
 
-// Add a comment to a blogpost
+
 app.post('/blogposts/:id/comment', async (req, res) => {
   const { id } = req.params;
-  const { text, authorUsername } = req.body; // Überprüfe, ob diese Werte wie erwartet empfangen werden
+  const { text, authorUsername } = req.body; 
   try {
     const blogpost = await Blogpost.findById(id);
     if (!blogpost) return res.status(404).send('Blogpost nicht gefunden.');
-    blogpost.comments.unshift({ text, authorUsername }); // Füge neuen Kommentar hinzu
+    blogpost.comments.unshift({ text, authorUsername });
     await blogpost.save();
     res.status(200).json(blogpost);
   } catch (error) {
     res.status(500).send(error.message);
   }
 });
-
-
-
-
 
 async function createUser(req, res, role) {
     try {
@@ -273,18 +297,13 @@ async function createUser(req, res, role) {
         role: role
       });
       const savedUser = await user.save();
-      console.log(savedUser); // Zum Debuggen hinzugefügt
+      console.log(savedUser);
       res.status(201).send({ userId: savedUser._id });
     } catch (error) {
-      console.error(error); // Zum Debuggen hinzugefügt
+      console.error(error); 
       res.status(400).send(error);
     }
 }
-
-
-
-
-
 
 app.listen(port, () => {
   console.log(`Server läuft auf http://localhost:${port}`);

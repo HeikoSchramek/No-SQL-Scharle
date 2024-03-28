@@ -45,7 +45,7 @@ export default {
         if (!response.ok) {
           throw new Error('Fehler beim Löschen des Benutzers.');
         }
-        this.fetchUsers(); // Aktualisiere die Benutzerliste nach dem Löschen
+        this.fetchUsers(); 
       } catch (error) {
         console.error('Fehler beim Löschen des Benutzers:', error);
       }

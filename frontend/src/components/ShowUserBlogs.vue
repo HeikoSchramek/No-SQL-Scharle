@@ -1,7 +1,6 @@
 <template>
   <div class="container">
     <h1 class="title">Meine Blogbeiträge</h1>
-    <!-- Hinweis, falls keine Beiträge vorhanden sind -->
     <p v-if="blogPosts.length === 0" class="no-posts">Keine Blogbeiträge gefunden. Beginne damit, deinen ersten Beitrag zu erstellen.</p>
     <div v-for="post in blogPosts" :key="post._id" class="section card">
       <h3>{{ post.title }}</h3>
@@ -33,7 +32,7 @@
     methods: {
       async fetchUserBlogPosts() {
         try {
-          const userId = sessionStorage.getItem('userId'); // Holen Sie die Benutzer-ID des angemeldeten Benutzers
+          const userId = sessionStorage.getItem('userId'); 
           const response = await fetch(`http://localhost:3000/blogposts/user/${userId}`);
           if (!response.ok) throw new Error('Fehler beim Abrufen der Blogbeiträge');
           this.blogPosts = await response.json();
@@ -45,7 +44,7 @@
         if (!confirm('Sind Sie sicher, dass Sie diesen Beitrag löschen möchten?')) return;
         try {
           await fetch(`http://localhost:3000/blogposts/${postId}`, { method: 'DELETE' });
-          this.fetchUserBlogPosts(); // Aktualisieren Sie die Liste der Blogbeiträge
+          this.fetchUserBlogPosts(); 
         } catch (error) {
           console.error(error);
         }
@@ -74,7 +73,7 @@ box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
   margin-top: 20px;
 }
 
-/* Angepasster Stil für den Blog-Beitragscontainer */
+
 .section.card {
   background-color: #f8f9fa;
   border: 1px solid #ddd;
@@ -85,10 +84,10 @@ box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
 }
 
 h3, p {
-  margin: 10px 0; /* Gibt Abstand zwischen Elementen */
+  margin: 10px 0; 
 }
 
-/* Stil für die Labels, ähnlich wie .profile-label im Benutzerprofil */
+
 h3 {
   font-weight: bold;
   color: #333;
@@ -100,7 +99,7 @@ p {
 
 .button-group {
   display: flex;
-  justify-content: flex-end; /* Buttons am rechten Rand ausrichten */
+  justify-content: flex-end; 
   margin-top: 10px;
 }
 
@@ -112,7 +111,7 @@ p {
   border: none;
   border-radius: 4px;
   transition: background-color 0.2s ease;
-  margin-left: 10px; /* Abstand zwischen den Buttons */
+  margin-left: 10px; 
   text-decoration: none;
 }
 
